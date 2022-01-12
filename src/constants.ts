@@ -4,13 +4,8 @@ import JSBI from 'jsbi'
 export type BigintIsh = JSBI | bigint | string
 
 export enum ChainId {
-  MAINNET = 1,
-  ROPSTEN = 3,
-  RINKEBY = 4,
-  GÖRLI = 5,
-  KOVAN = 42,
-  BSC_MAINNET = 56,
-  BSC_TESTNET = 97
+  MAINNET = 56,
+  TESTNET = 97
 }
 
 export enum TradeType {
@@ -28,23 +23,13 @@ type ChainAddress = {
   [chainId in ChainId]: string
 }
 export const FACTORY_ADDRESS: ChainAddress = {
-  [ChainId.MAINNET]: "0x0000000000000000000000000000000000000000",
-  [ChainId.ROPSTEN]: "0x0000000000000000000000000000000000000000",
-  [ChainId.RINKEBY]: "",
-  [ChainId.GÖRLI]: "",
-  [ChainId.KOVAN]: "",
-  [ChainId.BSC_MAINNET]: "0x3A71f57e3bbF82Ffd703a9317b04e19539251F48",
-  [ChainId.BSC_TESTNET]: "0x3A71f57e3bbF82Ffd703a9317b04e19539251F48"
+  [ChainId.MAINNET]: "0x3A71f57e3bbF82Ffd703a9317b04e19539251F48",
+  [ChainId.TESTNET]: "0x3A71f57e3bbF82Ffd703a9317b04e19539251F48"
 }
 
 export const INIT_CODE_HASH: ChainAddress = {
-  [ChainId.MAINNET]: "",
-  [ChainId.ROPSTEN]: '',
-  [ChainId.RINKEBY]: "",
-  [ChainId.GÖRLI]: "",
-  [ChainId.KOVAN]: "",
-  [ChainId.BSC_MAINNET]: "c77c879e1b82e0c305aea04633a968a80c88f71ce0d58e8480b9dbc722c4470e",
-  [ChainId.BSC_TESTNET]: "c77c879e1b82e0c305aea04633a968a80c88f71ce0d58e8480b9dbc722c4470e"
+  [ChainId.MAINNET]: "0xc77c879e1b82e0c305aea04633a968a80c88f71ce0d58e8480b9dbc722c4470e",
+  [ChainId.TESTNET]: '0xc77c879e1b82e0c305aea04633a968a80c88f71ce0d58e8480b9dbc722c4470e'
 }
 
 export const MINIMUM_LIQUIDITY = JSBI.BigInt(1000)
