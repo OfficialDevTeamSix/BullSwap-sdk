@@ -19,18 +19,9 @@ export enum Rounding {
   ROUND_UP
 }
 
-type ChainAddress = {
-  [chainId in ChainId]: string
-}
-export const FACTORY_ADDRESS: ChainAddress = {
-  [ChainId.MAINNET]: "0x3A71f57e3bbF82Ffd703a9317b04e19539251F48",
-  [ChainId.TESTNET]: "0x3A71f57e3bbF82Ffd703a9317b04e19539251F48"
-}
+export const FACTORY_ADDRESS = '0x3A71f57e3bbF82Ffd703a9317b04e19539251F48'
 
-export const INIT_CODE_HASH: ChainAddress = {
-  [ChainId.MAINNET]: "0xc77c879e1b82e0c305aea04633a968a80c88f71ce0d58e8480b9dbc722c4470e",
-  [ChainId.TESTNET]: '0xc77c879e1b82e0c305aea04633a968a80c88f71ce0d58e8480b9dbc722c4470e'
-}
+export const INIT_CODE_HASH = '0xc77c879e1b82e0c305aea04633a968a80c88f71ce0d58e8480b9dbc722c4470e'
 
 export const MINIMUM_LIQUIDITY = JSBI.BigInt(1000)
 
@@ -42,8 +33,8 @@ export const THREE = JSBI.BigInt(3)
 export const FIVE = JSBI.BigInt(5)
 export const TEN = JSBI.BigInt(10)
 export const _100 = JSBI.BigInt(100)
-export const _9950 = JSBI.BigInt(9950)
-export const _10000 = JSBI.BigInt(10000)
+export const FEES_NUMERATOR = JSBI.BigInt(9975)
+export const FEES_DENOMINATOR = JSBI.BigInt(10000)
 
 export enum SolidityType {
   uint8 = 'uint8',

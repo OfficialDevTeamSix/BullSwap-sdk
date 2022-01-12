@@ -16,7 +16,7 @@ var contracts = require('@ethersproject/contracts');
 var networks$1 = require('@ethersproject/networks');
 var providers = require('@ethersproject/providers');
 
-var _FACTORY_ADDRESS, _INIT_CODE_HASH, _SOLIDITY_TYPE_MAXIMA;
+var _SOLIDITY_TYPE_MAXIMA;
 
 (function (ChainId) {
   ChainId[ChainId["MAINNET"] = 56] = "MAINNET";
@@ -34,8 +34,8 @@ var _FACTORY_ADDRESS, _INIT_CODE_HASH, _SOLIDITY_TYPE_MAXIMA;
   Rounding[Rounding["ROUND_UP"] = 2] = "ROUND_UP";
 })(exports.Rounding || (exports.Rounding = {}));
 
-var FACTORY_ADDRESS = (_FACTORY_ADDRESS = {}, _FACTORY_ADDRESS[exports.ChainId.MAINNET] = "0x3A71f57e3bbF82Ffd703a9317b04e19539251F48", _FACTORY_ADDRESS[exports.ChainId.TESTNET] = "0x3A71f57e3bbF82Ffd703a9317b04e19539251F48", _FACTORY_ADDRESS);
-var INIT_CODE_HASH = (_INIT_CODE_HASH = {}, _INIT_CODE_HASH[exports.ChainId.MAINNET] = "0xc77c879e1b82e0c305aea04633a968a80c88f71ce0d58e8480b9dbc722c4470e", _INIT_CODE_HASH[exports.ChainId.TESTNET] = '0xc77c879e1b82e0c305aea04633a968a80c88f71ce0d58e8480b9dbc722c4470e', _INIT_CODE_HASH);
+var FACTORY_ADDRESS = '0x3A71f57e3bbF82Ffd703a9317b04e19539251F48';
+var INIT_CODE_HASH = '0xc77c879e1b82e0c305aea04633a968a80c88f71ce0d58e8480b9dbc722c4470e';
 var MINIMUM_LIQUIDITY = /*#__PURE__*/JSBI.BigInt(1000); // exports for internal consumption
 
 var ZERO = /*#__PURE__*/JSBI.BigInt(0);
@@ -45,8 +45,8 @@ var THREE = /*#__PURE__*/JSBI.BigInt(3);
 var FIVE = /*#__PURE__*/JSBI.BigInt(5);
 var TEN = /*#__PURE__*/JSBI.BigInt(10);
 var _100 = /*#__PURE__*/JSBI.BigInt(100);
-var _9950 = /*#__PURE__*/JSBI.BigInt(9950);
-var _10000 = /*#__PURE__*/JSBI.BigInt(10000);
+var FEES_NUMERATOR = /*#__PURE__*/JSBI.BigInt(9975);
+var FEES_DENOMINATOR = /*#__PURE__*/JSBI.BigInt(10000);
 var SolidityType;
 
 (function (SolidityType) {
@@ -368,7 +368,7 @@ function Currency(decimals, symbol, name) {
  * The only instance of the base class `Currency`.
  */
 
-Currency.ETHER = /*#__PURE__*/new Currency(18, 'BNB', "Binance");
+Currency.ETHER = /*#__PURE__*/new Currency(18, 'BNB', 'BNB');
 var ETHER = Currency.ETHER;
 
 var _WETH;
@@ -758,24 +758,19 @@ var Pair = /*#__PURE__*/function () {
   function Pair(tokenAmountA, tokenAmountB) {
     var tokenAmounts = tokenAmountA.token.sortsBefore(tokenAmountB.token) // does safety checks
     ? [tokenAmountA, tokenAmountB] : [tokenAmountB, tokenAmountA];
-    this.liquidityToken = new Token(tokenAmounts[0].token.chainId, Pair.getAddress(tokenAmounts[0].token, tokenAmounts[1].token, tokenAmounts[0].token.chainId), 18, 'SBS', 'Bull-Swap');
+    this.liquidityToken = new Token(tokenAmounts[0].token.chainId, Pair.getAddress(tokenAmounts[0].token, tokenAmounts[1].token), 18, 'Cake-LP', 'Pancake LPs');
     this.tokenAmounts = tokenAmounts;
   }
 
-  Pair.getAddress = function getAddress(tokenA, tokenB, chainId) {
+  Pair.getAddress = function getAddress(tokenA, tokenB) {
     var _PAIR_ADDRESS_CACHE, _PAIR_ADDRESS_CACHE$t;
-
-    if (chainId === void 0) {
-      chainId = exports.ChainId.TESTNET;
-    }
 
     var tokens = tokenA.sortsBefore(tokenB) ? [tokenA, tokenB] : [tokenB, tokenA]; // does safety checks
 
     if (((_PAIR_ADDRESS_CACHE = PAIR_ADDRESS_CACHE) === null || _PAIR_ADDRESS_CACHE === void 0 ? void 0 : (_PAIR_ADDRESS_CACHE$t = _PAIR_ADDRESS_CACHE[tokens[0].address]) === null || _PAIR_ADDRESS_CACHE$t === void 0 ? void 0 : _PAIR_ADDRESS_CACHE$t[tokens[1].address]) === undefined) {
       var _PAIR_ADDRESS_CACHE2, _extends2, _extends3;
 
-      PAIR_ADDRESS_CACHE = _extends({}, PAIR_ADDRESS_CACHE, (_extends3 = {}, _extends3[tokens[0].address] = _extends({}, (_PAIR_ADDRESS_CACHE2 = PAIR_ADDRESS_CACHE) === null || _PAIR_ADDRESS_CACHE2 === void 0 ? void 0 : _PAIR_ADDRESS_CACHE2[tokens[0].address], (_extends2 = {}, _extends2[tokens[1].address] = address.getCreate2Address( // @ts-ignore
-      FACTORY_ADDRESS[chainId || tokenA.chainId], solidity.keccak256(['bytes'], [solidity.pack(['address', 'address'], [tokens[0].address, tokens[1].address])]), INIT_CODE_HASH[chainId || tokenA.chainId]), _extends2)), _extends3));
+      PAIR_ADDRESS_CACHE = _extends({}, PAIR_ADDRESS_CACHE, (_extends3 = {}, _extends3[tokens[0].address] = _extends({}, (_PAIR_ADDRESS_CACHE2 = PAIR_ADDRESS_CACHE) === null || _PAIR_ADDRESS_CACHE2 === void 0 ? void 0 : _PAIR_ADDRESS_CACHE2[tokens[0].address], (_extends2 = {}, _extends2[tokens[1].address] = address.getCreate2Address(FACTORY_ADDRESS, solidity.keccak256(['bytes'], [solidity.pack(['address', 'address'], [tokens[0].address, tokens[1].address])]), INIT_CODE_HASH), _extends2)), _extends3));
     }
 
     return PAIR_ADDRESS_CACHE[tokens[0].address][tokens[1].address];
@@ -823,9 +818,9 @@ var Pair = /*#__PURE__*/function () {
 
     var inputReserve = this.reserveOf(inputAmount.token);
     var outputReserve = this.reserveOf(inputAmount.token.equals(this.token0) ? this.token1 : this.token0);
-    var inputAmountWithFee = JSBI.multiply(inputAmount.raw, _9950);
+    var inputAmountWithFee = JSBI.multiply(inputAmount.raw, FEES_NUMERATOR);
     var numerator = JSBI.multiply(inputAmountWithFee, outputReserve.raw);
-    var denominator = JSBI.add(JSBI.multiply(inputReserve.raw, _10000), inputAmountWithFee);
+    var denominator = JSBI.add(JSBI.multiply(inputReserve.raw, FEES_DENOMINATOR), inputAmountWithFee);
     var outputAmount = new TokenAmount(inputAmount.token.equals(this.token0) ? this.token1 : this.token0, JSBI.divide(numerator, denominator));
 
     if (JSBI.equal(outputAmount.raw, ZERO)) {
@@ -844,8 +839,8 @@ var Pair = /*#__PURE__*/function () {
 
     var outputReserve = this.reserveOf(outputAmount.token);
     var inputReserve = this.reserveOf(outputAmount.token.equals(this.token0) ? this.token1 : this.token0);
-    var numerator = JSBI.multiply(JSBI.multiply(inputReserve.raw, outputAmount.raw), _10000);
-    var denominator = JSBI.multiply(JSBI.subtract(outputReserve.raw, outputAmount.raw), _9950);
+    var numerator = JSBI.multiply(JSBI.multiply(inputReserve.raw, outputAmount.raw), FEES_DENOMINATOR);
+    var denominator = JSBI.multiply(JSBI.subtract(outputReserve.raw, outputAmount.raw), FEES_NUMERATOR);
     var inputAmount = new TokenAmount(outputAmount.token.equals(this.token0) ? this.token1 : this.token0, JSBI.add(JSBI.divide(numerator, denominator), ONE));
     return [inputAmount, new Pair(inputReserve.add(inputAmount), outputReserve.subtract(outputAmount))];
   };
@@ -1145,7 +1140,6 @@ var Trade = /*#__PURE__*/function () {
     this.outputAmount = tradeType === exports.TradeType.EXACT_OUTPUT ? amount : route.output === ETHER ? CurrencyAmount.ether(amounts[amounts.length - 1].raw) : amounts[amounts.length - 1];
     this.executionPrice = new Price(this.inputAmount.currency, this.outputAmount.currency, this.inputAmount.raw, this.outputAmount.raw);
     this.nextMidPrice = Price.fromRoute(new Route(nextPairs, route.input));
-    console.log(route.midPrice.toSignificant(6), this.inputAmount.toSignificant(6), this.outputAmount.toSignificant(6));
     this.priceImpact = computePriceImpact(route.midPrice, this.inputAmount, this.outputAmount);
   }
   /**
@@ -1238,34 +1232,19 @@ var Trade = /*#__PURE__*/function () {
       bestTrades = [];
     }
 
-    console.log(pairs, currencyAmountIn, currencyOut, {
-      maxNumResults: maxNumResults,
-      maxHops: maxHops
-    }, currentPairs, originalAmountIn, bestTrades);
     !(pairs.length > 0) ?  invariant(false, 'PAIRS')  : void 0;
     !(maxHops > 0) ?  invariant(false, 'MAX_HOPS')  : void 0;
     !(originalAmountIn === currencyAmountIn || currentPairs.length > 0) ?  invariant(false, 'INVALID_RECURSION')  : void 0;
     var chainId = currencyAmountIn instanceof TokenAmount ? currencyAmountIn.token.chainId : currencyOut instanceof Token ? currencyOut.chainId : undefined;
-    console.log(chainId);
     !(chainId !== undefined) ?  invariant(false, 'CHAIN_ID')  : void 0;
     var amountIn = wrappedAmount(currencyAmountIn, chainId);
     var tokenOut = wrappedCurrency(currencyOut, chainId);
-    console.log(amountIn, tokenOut);
 
     for (var i = 0; i < pairs.length; i++) {
-      var pair = pairs[i];
-      console.log(pair); // pair irrelevant
+      var pair = pairs[i]; // pair irrelevant
 
-      if (!pair.token0.equals(amountIn.token) && !pair.token1.equals(amountIn.token)) {
-        console.log('irrelevant pair');
-        continue;
-      }
-
-      if (pair.reserve0.equalTo(ZERO) || pair.reserve1.equalTo(ZERO)) {
-        console.log('zero reserve');
-        continue;
-      }
-
+      if (!pair.token0.equals(amountIn.token) && !pair.token1.equals(amountIn.token)) continue;
+      if (pair.reserve0.equalTo(ZERO) || pair.reserve1.equalTo(ZERO)) continue;
       var amountOut = void 0;
 
       try {
@@ -1274,11 +1253,9 @@ var Trade = /*#__PURE__*/function () {
         var _pair$getOutputAmount2 = pair.getOutputAmount(amountIn);
 
         amountOut = _pair$getOutputAmount2[0];
-        console.log(amountOut);
       } catch (error) {
         // input too low
         if (error.isInsufficientInputAmountError) {
-          console.log('error on fetching amountOut');
           continue;
         }
 
@@ -1287,7 +1264,6 @@ var Trade = /*#__PURE__*/function () {
 
 
       if (amountOut.token.equals(tokenOut)) {
-        console.log('find a route');
         sortedInsert(bestTrades, new Trade(new Route([].concat(currentPairs, [pair]), originalAmountIn.currency, currencyOut), originalAmountIn, exports.TradeType.EXACT_INPUT), maxNumResults, tradeComparator);
       } else if (maxHops > 1 && pairs.length > 1) {
         var pairsExcludingThisPair = pairs.slice(0, i).concat(pairs.slice(i + 1, pairs.length)); // otherwise, consider all the other paths that lead from this token as long as we have not exceeded maxHops
@@ -1393,7 +1369,7 @@ function toHex(currencyAmount) {
 
 var ZERO_HEX = '0x0';
 /**
- * Represents the Uniswap V2 Router, and has static methods for helping execute trades.
+ * Represents the Pancake Router, and has static methods for helping execute trades.
  */
 
 var Router = /*#__PURE__*/function () {
@@ -1413,14 +1389,14 @@ var Router = /*#__PURE__*/function () {
     var etherOut = trade.outputAmount.currency === ETHER; // the router does not support both ether in and out
 
     !!(etherIn && etherOut) ?  invariant(false, 'ETHER_IN_OUT')  : void 0;
-    !(options.ttl > 0) ?  invariant(false, 'TTL')  : void 0;
+    !(!('ttl' in options) || options.ttl > 0) ?  invariant(false, 'TTL')  : void 0;
     var to = validateAndParseAddress(options.recipient);
     var amountIn = toHex(trade.maximumAmountIn(options.allowedSlippage));
     var amountOut = toHex(trade.minimumAmountOut(options.allowedSlippage));
     var path = trade.route.path.map(function (token) {
       return token.address;
     });
-    var deadline = "0x" + (Math.floor(new Date().getTime() / 1000) + options.ttl).toString(16);
+    var deadline = 'ttl' in options ? "0x" + (Math.floor(new Date().getTime() / 1000) + options.ttl).toString(16) : "0x" + options.deadline.toString(16);
     var useFeeOnTransfer = Boolean(options.feeOnTransfer);
     var methodName;
     var args;
@@ -8414,7 +8390,7 @@ var Fetcher = /*#__PURE__*/function () {
     try {
       if (provider === undefined) provider = providers.getDefaultProvider(networks$1.getNetwork(tokenA.chainId));
       !(tokenA.chainId === tokenB.chainId) ? "development" !== "production" ? invariant(false, 'CHAIN_ID') : invariant(false) : void 0;
-      var address = Pair.getAddress(tokenA, tokenB, tokenA.chainId);
+      var address = Pair.getAddress(tokenA, tokenB);
       return Promise.resolve(new contracts.Contract(address, IBullSwapPair.abi, provider).getReserves()).then(function (_ref) {
         var reserves0 = _ref[0],
             reserves1 = _ref[1];

@@ -6,7 +6,6 @@ import { Currency } from './currency'
 /**
  * Represents an ERC20 token with a unique address and some metadata.
  */
-
 export class Token extends Currency {
   public readonly chainId: ChainId
   public readonly address: string
@@ -65,7 +64,6 @@ export function currencyEquals(currencyA: Currency, currencyB: Currency): boolea
     return currencyA === currencyB
   }
 }
-
 
 export const WETH = {
   [ChainId.MAINNET]: new Token(
